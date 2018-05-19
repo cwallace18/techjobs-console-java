@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by LaunchCode
@@ -84,48 +85,31 @@ public class JobData {
         return jobs;
     }
 
-    public static void findByValue(String value) {
+    public static ArrayList<HashMap<String, String>> findByValue(String value) {
 
-        //load data
+        // load data, if not already loaded
         loadData();
 
-        Integer numJobs = allJobs.size();
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
 
-        //if no jobs, inform user
-        if (numJobs <= 0) {
-            System.out.println("No job postings match search");
-        } else {
+        for (HashMap<String, String> row : allJobs) {
 
-            int numPosts = 0;
-            //for each post in job_data.csv, check listing
-            for (HashMap<String, String> someJobs : allJobs) {
+            for (Map.Entry<String, String> column : row.entrySet()) {
 
-                //for each listing, check each attribute
-                for (String jobAttribute : someJobs.keySet()) {
+                String k = column.getKey();
+                String v = column.getValue();
 
-                    //for each attribute, check for search term
-                    if (someJobs.get(jobAttribute).toLowerCase().contains(value.toLowerCase())) {
-                        numPosts += 1;
-                        System.out.println("*****\n" + numPosts);
+                value = value.toLowerCase();
+                k = k.toLowerCase();
+                v = v.toLowerCase();
 
-                        HashMap<String, String> jobPost = new HashMap<>(someJobs);
+                if (v.contains(value) || k.contains(value)) {
+                    jobs.add(row);
 
-                        //for each attribute in listing, print attribute type and  name
-                        for (String attribute : jobPost.keySet()) {
-                            String postKey = attribute;
-                            String keyValue = jobPost.get(attribute);
-                            System.out.println(postKey + " : " + keyValue);
-                        }
-
-                        System.out.println("*****");
-
-                        break;
-                    }
                 }
             }
-
-            System.out.println(numPosts);
         }
+        return jobs;
 
     }
     /**
